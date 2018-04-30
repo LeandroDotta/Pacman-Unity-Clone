@@ -36,13 +36,12 @@ public class PlayerController : MonoBehaviour
 		}
 			
 		Vector3Int inputNextCell = gridPosition + Vector3Int.CeilToInt((Vector3)inputDirection);
-		Vector3Int nextCell = gridPosition + Vector3Int.CeilToInt((Vector3)direction);
-
 		bool canTurn = maze.CanMove(inputNextCell);
 		if(canTurn) {
 			direction = inputDirection;
 		}
 
+		Vector3Int nextCell = gridPosition + Vector3Int.CeilToInt((Vector3)direction);
 		bool canMove = maze.CanMove (nextCell);
 		if (canMove) {
 			Move ();
@@ -51,6 +50,10 @@ public class PlayerController : MonoBehaviour
 		gridPosition = maze.grid.WorldToCell(transform.position);
 
 		Centering(canMove);
+
+		if (maze.HasDot(gridPosition)) {
+			maze.RemoveDot (gridPosition);
+		}
 	}
 
 	private void FaceDirection()
@@ -68,25 +71,41 @@ public class PlayerController : MonoBehaviour
 	private void Centering(bool bothAxis)
 	{
 		Vector3 cellCenter = maze.grid.GetCellCenterWorld(gridPosition);
-
+//		Vector2 centerDirection = Vector2.zero;
+//		Vector3 position = transform.position;
+//
+//		if (position != cellCenter) {
+//			centerDirection = cellCenter - position;
+//
+//			if (!bothAxis) {
+//				if (direction.x != 0) {
+//					centerDirection.x = 0;
+//				} else {
+//					centerDirection.y = 0;
+//				}
+//			}
+//
+//			Vector2 movement = centerDirection * speed * Time.deltaTime;
+//			transform.Translate(movement);
+//		}
 
 
 		if (direction.x != 0) { 
 			// Movendo na horizontal
 			if (transform.position.y != cellCenter.y) {
 				
-				Vector3 position = transform.position;
-				position.y = cellCenter.y;
+				Vector3 pos = transform.position;
+				pos.y = cellCenter.y;
 
-				transform.position = position;
+				transform.position = pos;
 			}
 		} else {
 			// Movendo na vertical
 			if (transform.position.x != cellCenter.x) {
-				Vector3 position = transform.position;
-				position.x = cellCenter.x;
+				Vector3 pos = transform.position;
+				pos.x = cellCenter.x;
 
-				transform.position = position;
+				transform.position = pos;
 			}
 		}
 	}
