@@ -9847,6 +9847,7 @@ MonoBehaviour:
   grid: {fileID: 779573011}
   mazeTilemap: {fileID: 42492991}
   dotTilemap: {fileID: 435329683}
+  bonusSymbolPrefabs: []
 --- !u!1 &1938474854
 GameObject:
   m_ObjectHideFlags: 0

@@ -9,6 +9,9 @@ public class Maze : MonoBehaviour
 	public Tilemap mazeTilemap;
 	public Tilemap dotTilemap;
 
+	[Header("Fruits Per Level")]
+	public GameObject[] bonusSymbolPrefabs;
+
 
 	public bool CanMove(Vector3Int cell)
 	{
@@ -22,6 +25,11 @@ public class Maze : MonoBehaviour
 
 	public void RemoveDot(Vector3Int cell)
 	{
+		Tile tile = dotTilemap.GetTile(cell) as Tile;
+
+		if(tile != null)
+			Debug.Log(tile.name);
+
 		dotTilemap.SetTile(cell, null);
 
 		GameManager.Instance.AddScore (10);
