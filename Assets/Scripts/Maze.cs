@@ -52,7 +52,7 @@ public class Maze : MonoBehaviour
 
 		totalDots = GetTileCount(ref dotTilemap);
 
-		Debug.Log ("Dot Count: " + dotCount);
+		Debug.Log ("Dot Total: " + totalDots);
 	}
 
 	public bool CanMove(Vector3Int cell)
