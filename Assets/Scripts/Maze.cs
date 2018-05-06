@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
+public struct MazeCell
+{
+	public Vector3Int position;
+	public Vector3Int direction;
+	public bool canMove;
+}
+
 public class Maze : MonoBehaviour 
 {
 	public static Maze Instance { get; private set; }
@@ -11,6 +18,13 @@ public class Maze : MonoBehaviour
 	public Tilemap mazeTilemap;
 	public Tilemap dotTilemap;
 
+	[Header("Ghosts")]
+	public Ghost blinky;
+	public Ghost pinky;
+	public Ghost inky;
+	public Ghost clyde;
+
+	[Header("Bonus Config")]
 	public int dotsForFirstBonus;
 	public int dotsForSecondBonus;
 	public Vector2 bonusPosition;
@@ -44,6 +58,16 @@ public class Maze : MonoBehaviour
 	public bool CanMove(Vector3Int cell)
 	{
 		return !mazeTilemap.HasTile(cell);
+	}
+
+	public MazeCell NextCell(Vector3Int currentCell, Vector3Int direction)
+	{
+		MazeCell cell = new MazeCell ();
+		cell.position = currentCell + direction;
+		cell.direction = direction;
+		cell.canMove = CanMove(cell.position);
+
+		return cell;
 	}
 
 	public bool HasDot(Vector3Int cell)
@@ -106,5 +130,22 @@ public class Maze : MonoBehaviour
 	public void RemoveBonus()
 	{
 		currentBonus = null;
+	}
+
+	public bool HasGhost(Vector3Int cell)
+	{
+		if (blinky != null && blinky.gridPosition == cell)
+			return true;
+
+		if (pinky != null && pinky.gridPosition == cell)
+			return true;
+
+		if (inky != null && inky.gridPosition == cell)
+			return true;
+
+		if (clyde != null && clyde.gridPosition == cell)
+			return true;
+
+		return false;
 	}
 }

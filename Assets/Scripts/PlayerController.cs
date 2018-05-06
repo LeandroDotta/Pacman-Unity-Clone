@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
 
     private Vector2 direction = Vector2.left;
     private Vector2 inputDirection = Vector2.left;
+	private Vector3 startPosition;
     private Vector3Int gridPosition;
 	private Animator anim;
 	private bool moving;
@@ -19,6 +20,7 @@ public class PlayerController : MonoBehaviour
 
 	private void Start() 
 	{
+		startPosition = transform.position;
 		anim = GetComponent<Animator>();
 	}
 
@@ -139,6 +141,16 @@ public class PlayerController : MonoBehaviour
 			}
 		}
 
-		// TODO Colisão com o fantasma
+		// Colisão com o fantasma
+		if (maze.HasGhost(gridPosition))
+		{
+			GameManager.Instance.LoseLife ();
+			ResetPosition ();
+		}
+	}
+
+	private void ResetPosition()
+	{
+		transform.position = startPosition;
 	}
 }
