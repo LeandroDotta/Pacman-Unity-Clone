@@ -9801,7 +9801,7 @@ MonoBehaviour:
   dotsForSecondBonus: 170
   bonusPosition: {x: -0, y: -3.5}
   currentBonus: {fileID: 0}
-  currentLevel: 13
+  currentLevel: 1
   bonusSymbolPrefabs:
   - {fileID: 1853451027333210, guid: ebf1ee30436021840870606de756266d, type: 2}
   - {fileID: 1846345414353252, guid: e3b86084513b8fb468d1ede265f6e1f1, type: 2}
