@@ -71,10 +71,7 @@ public class PlayerController : MonoBehaviour
 		moving = canMove || centering;
 		anim.SetBool("moving", moving);
 
-        if (maze.HasDot(gridPosition))
-        {
-            maze.RemoveDot(gridPosition);
-        }
+		DectectCollisions();
     }
 
     private void FaceDirection()
@@ -124,4 +121,24 @@ public class PlayerController : MonoBehaviour
         Vector2 movement = direction * speed * Time.deltaTime;
         transform.Translate(movement);
     }
+
+	private void DectectCollisions()
+	{
+		// Colisão com o dot
+		if (maze.HasDot(gridPosition))
+		{
+			maze.CollectDot(gridPosition);
+		}
+
+		// Colisão com o bonus
+		if (maze.currentBonus != null) 
+		{
+			if (gridPosition == maze.currentBonus.gridPosition) 
+			{
+				maze.currentBonus.Collect();
+			}
+		}
+
+		// TODO Colisão com o fantasma
+	}
 }

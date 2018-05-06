@@ -5,13 +5,41 @@ using UnityEngine.Tilemaps;
 
 public class Maze : MonoBehaviour 
 {
+	public static Maze Instance { get; private set; }
+
 	public Grid grid;
 	public Tilemap mazeTilemap;
 	public Tilemap dotTilemap;
 
-	[Header("Fruits Per Level")]
+	public int dotsForFirstBonus;
+	public int dotsForSecondBonus;
+	public Vector2 bonusPosition;
+	public BonusSymbol currentBonus;
+
+	public int currentLevel = 1;
+
+	[Header("Bonus Per Level")]
 	public GameObject[] bonusSymbolPrefabs;
 
+	private int totalDots;
+	private int dotCount = 0;
+
+	private void Awake() 
+	{
+		if (Instance == null)
+			Instance = this;
+		else if(Instance != this)
+			Instance = null;
+	}
+
+	private void Start()
+	{
+		dotTilemap.CompressBounds(); // Garante que o "bounds" do tilemap não estará alem das areas desenhadas
+
+		totalDots = GetTileCount(ref dotTilemap);
+
+		Debug.Log ("Dot Count: " + dotCount);
+	}
 
 	public bool CanMove(Vector3Int cell)
 	{
@@ -23,15 +51,60 @@ public class Maze : MonoBehaviour
 		return dotTilemap.HasTile(cell);
 	}
 
-	public void RemoveDot(Vector3Int cell)
+	public void CollectDot(Vector3Int cell)
 	{
-		Tile tile = dotTilemap.GetTile(cell) as Tile;
+		DotTile tile = dotTilemap.GetTile<DotTile>(cell);
 
-		if(tile != null)
-			Debug.Log(tile.name);
+		if (tile != null) {
+			GameManager.Instance.AddScore(tile.score);
 
-		dotTilemap.SetTile(cell, null);
+			if(tile.isEnergizer)
+			{
+				// TODO Aplicar estado de invulnerabilidade
+			}
 
-		GameManager.Instance.AddScore (10);
+			dotTilemap.SetTile(cell, null);
+			dotCount++;
+
+			if (dotCount == totalDots) {
+				// TODO Fim do jogo (Vitória)
+				Debug.Log("Venceu!");
+			}
+
+			if (dotCount == dotsForFirstBonus || dotCount == dotsForSecondBonus) {
+				// TODO Adicionar bonus da fase
+				AddBonus();
+			}
+		}
+	}
+
+	public int GetTileCount(ref Tilemap tilemap)
+	{
+		int count = 0;
+
+		for (int y = tilemap.origin.y; y < (tilemap.origin.y + tilemap.size.y); y++)
+		{
+			for (int x = tilemap.origin.x; x < (tilemap.origin.x + tilemap.size.x); x++)
+			{
+				if(tilemap.HasTile(new Vector3Int(x, y, 0)))
+					count++;
+			}
+		}
+
+		return count;
+	}
+
+	public void AddBonus()
+	{
+		GameObject bonus = Instantiate (bonusSymbolPrefabs [currentLevel-1]);
+		bonus.transform.position = bonusPosition;
+		bonus.SetActive (true);
+
+		currentBonus = bonus.GetComponent<BonusSymbol>();
+	}
+
+	public void RemoveBonus()
+	{
+		currentBonus = null;
 	}
 }

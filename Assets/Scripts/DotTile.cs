@@ -5,5 +5,5 @@ using UnityEngine.Tilemaps;
 public class DotTile : Tile
 {
 	public bool isEnergizer;
-	public float score;
+	public int score;
 }
