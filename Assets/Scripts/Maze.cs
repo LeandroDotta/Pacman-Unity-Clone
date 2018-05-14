@@ -3,135 +3,149 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class Maze : MonoBehaviour
+public struct MazeCell
 {
-    public static Maze Instance { get; private set; }
+	public Vector3Int position;
+	public Vector3Int direction;
+	public bool canMove;
+}
 
-    public Grid grid;
-    public Tilemap mazeTilemap;
-    public Tilemap dotTilemap;
+public class Maze : MonoBehaviour 
+{
+	public static Maze Instance { get; private set; }
 
-    [Header("Ghosts")]
-    public Ghost blinky;
-    public Ghost pinky;
-    public Ghost inky;
-    public Ghost clyde;
+	public Grid grid;
+	public Tilemap mazeTilemap;
+	public Tilemap dotTilemap;
 
-    [Header("Bonus Config")]
-    public int dotsForFirstBonus;
-    public int dotsForSecondBonus;
-    public Vector2 bonusPosition;
-    public BonusSymbol currentBonus;
+	[Header("Ghosts")]
+	public Ghost blinky;
+	public Ghost pinky;
+	public Ghost inky;
+	public Ghost clyde;
 
-    public int currentLevel = 1;
+	[Header("Bonus Config")]
+	public int dotsForFirstBonus;
+	public int dotsForSecondBonus;
+	public Vector2 bonusPosition;
+	public BonusSymbol currentBonus;
 
-    [Header("Bonus Per Level")]
-    public GameObject[] bonusSymbolPrefabs;
+	public int currentLevel = 1;
 
-    private int totalDots;
-    private int dotCount = 0;
+	[Header("Bonus Per Level")]
+	public GameObject[] bonusSymbolPrefabs;
 
-    private void Awake()
-    {
-        if (Instance == null)
-            Instance = this;
-        else if (Instance != this)
-            Instance = null;
-    }
+	private int totalDots;
+	private int dotCount = 0;
 
-    private void Start()
-    {
-        dotTilemap.CompressBounds(); // Garante que o "bounds" do tilemap não estará alem das areas desenhadas
+	private void Awake() 
+	{
+		if (Instance == null)
+			Instance = this;
+		else if(Instance != this)
+			Instance = null;
+	}
 
-        totalDots = GetTileCount(ref dotTilemap);
+	private void Start()
+	{
+		dotTilemap.CompressBounds(); // Garante que o "bounds" do tilemap não estará alem das areas desenhadas
 
-        Debug.Log("Dot Total: " + totalDots);
-    }
+		totalDots = GetTileCount(ref dotTilemap);
 
-    public bool CanMove(Vector3Int cell)
-    {
-        return !mazeTilemap.HasTile(cell);
-    }
+		Debug.Log ("Dot Total: " + totalDots);
+	}
 
-    public bool HasDot(Vector3Int cell)
-    {
-        return dotTilemap.HasTile(cell);
-    }
+	public bool CanMove(Vector3Int cell)
+	{
+		return !mazeTilemap.HasTile(cell);
+	}
 
-    public void CollectDot(Vector3Int cell)
-    {
-        DotTile tile = dotTilemap.GetTile<DotTile>(cell);
+	public MazeCell NextCell(Vector3Int currentCell, Vector3Int direction)
+	{
+		MazeCell cell = new MazeCell ();
+		cell.position = currentCell + direction;
+		cell.direction = direction;
+		cell.canMove = CanMove(cell.position);
 
-        if (tile != null)
-        {
-            GameManager.Instance.AddScore(tile.score);
+		return cell;
+	}
 
-            if (tile.isEnergizer)
-            {
-                // TODO Aplicar estado de invulnerabilidade
-            }
+	public bool HasDot(Vector3Int cell)
+	{
+		return dotTilemap.HasTile(cell);
+	}
 
-            dotTilemap.SetTile(cell, null);
-            dotCount++;
+	public void CollectDot(Vector3Int cell)
+	{
+		DotTile tile = dotTilemap.GetTile<DotTile>(cell);
 
-            if (dotCount == totalDots)
-            {
-                // TODO Fim do jogo (Vitória)
-                Debug.Log("Venceu!");
-            }
+		if (tile != null) {
+			GameManager.Instance.AddScore(tile.score);
 
-            if (dotCount == dotsForFirstBonus || dotCount == dotsForSecondBonus)
-            {
-                // TODO Adicionar bonus da fase
-                AddBonus();
-            }
-        }
-    }
-    
-    public int GetTileCount(ref Tilemap tilemap)
-    {
-        int count = 0;
+			if(tile.isEnergizer)
+			{
+				// TODO Aplicar estado de invulnerabilidade
+			}
 
-        for (int y = tilemap.origin.y; y < (tilemap.origin.y + tilemap.size.y); y++)
-        {
-            for (int x = tilemap.origin.x; x < (tilemap.origin.x + tilemap.size.x); x++)
-            {
-                if (tilemap.HasTile(new Vector3Int(x, y, 0)))
-                    count++;
-            }
-        }
+			dotTilemap.SetTile(cell, null);
+			dotCount++;
 
-        return count;
-    }
+			if (dotCount == totalDots) {
+				// TODO Fim do jogo (Vitória)
+				Debug.Log("Venceu!");
+			}
 
-    public void AddBonus()
-    {
-        GameObject bonus = Instantiate(bonusSymbolPrefabs[currentLevel - 1]);
-        bonus.transform.position = bonusPosition;
-        bonus.SetActive(true);
+			if (dotCount == dotsForFirstBonus || dotCount == dotsForSecondBonus) {
+				// TODO Adicionar bonus da fase
+				AddBonus();
+			}
+		}
+	}
 
-        currentBonus = bonus.GetComponent<BonusSymbol>();
-    }
+	public int GetTileCount(ref Tilemap tilemap)
+	{
+		int count = 0;
 
-    public void RemoveBonus()
-    {
-        currentBonus = null;
-    }
+		for (int y = tilemap.origin.y; y < (tilemap.origin.y + tilemap.size.y); y++)
+		{
+			for (int x = tilemap.origin.x; x < (tilemap.origin.x + tilemap.size.x); x++)
+			{
+				if(tilemap.HasTile(new Vector3Int(x, y, 0)))
+					count++;
+			}
+		}
 
-    public bool HasGhost(Vector3Int cell)
-    {
-        if (blinky != null && blinky.gridPosition == cell)
-            return true;
+		return count;
+	}
 
-        if (pinky != null && pinky.gridPosition == cell)
-            return true;
+	public void AddBonus()
+	{
+		GameObject bonus = Instantiate (bonusSymbolPrefabs [currentLevel-1]);
+		bonus.transform.position = bonusPosition;
+		bonus.SetActive (true);
 
-        if (inky != null && inky.gridPosition == cell)
-            return true;
+		currentBonus = bonus.GetComponent<BonusSymbol>();
+	}
 
-        if (clyde != null && clyde.gridPosition == cell)
-            return true;
+	public void RemoveBonus()
+	{
+		currentBonus = null;
+	}
 
-        return false;
-    }
+	public bool HasGhost(Vector3Int cell)
+	{
+		if (blinky != null && blinky.gridPosition == cell)
+			return true;
+
+		if (pinky != null && pinky.gridPosition == cell)
+			return true;
+
+		if (inky != null && inky.gridPosition == cell)
+			return true;
+
+		if (clyde != null && clyde.gridPosition == cell)
+			return true;
+
+		return false;
+	}
 }
