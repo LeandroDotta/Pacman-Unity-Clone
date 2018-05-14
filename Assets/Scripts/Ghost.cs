@@ -1,138 +1,140 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
-public class Ghost : MonoBehaviour 
+public class Ghost : MonoBehaviour
 {
-	public float speed;
-	[HideInInspector] public Vector3Int gridPosition;
+    public float speed;
+    [HideInInspector] public Vector3Int gridPosition;
+	private Vector3 cellCenter;
 
-	private Vector3Int direction = Vector3Int.left;
-	private Vector2 moveTo;
+    private Vector3Int direction = Vector3Int.left;
+    private Vector2 moveTo;
+	private bool turning;
 
-	private MazeCell cellUp;
-	private MazeCell cellDown;
-	private MazeCell cellLeft;
-	private MazeCell cellRight;
-	private MazeCell nextCell;
+    private bool canMoveUp;
+    private bool canMoveDown;
+    private bool canMoveLeft;
+    private bool canMoveRight;
+    private Vector3Int cellUp;
+    private Vector3Int cellDown;
+    private Vector3Int cellLeft;
+    private Vector3Int cellRight;
 
-	private Maze maze;
+    private Maze maze;
 
-	private void Start()
-	{
-		maze = Maze.Instance;
-	}
+    private void Start()
+    {
+        maze = Maze.Instance;
+    }
 
-	private void Update()
-	{
-		gridPosition = maze.grid.WorldToCell(transform.position);
+    private void Update()
+    {
+        Vector3Int pos = maze.grid.WorldToCell(transform.position);
 
-		cellUp = maze.NextCell(gridPosition, Vector3Int.up);
-		cellDown = maze.NextCell(gridPosition, Vector3Int.down);
-		cellLeft = maze.NextCell(gridPosition, Vector3Int.left);
-		cellRight = maze.NextCell(gridPosition, Vector3Int.right);
+        if (pos != gridPosition)
+        {
+            OnCellChange(pos);
+        }
 
-		if (direction == cellUp.direction)
-			nextCell = cellUp;
-		else if (direction == cellDown.direction)
-			nextCell = cellDown;
-		else if (direction == cellLeft.direction)
-			nextCell = cellLeft;
-		else if (direction == cellRight.direction)
-			nextCell = cellRight;
+        Move();
 
-		if (nextCell.canMove) {
-			moveTo = maze.grid.GetCellCenterWorld(nextCell.position);	
-		}
+		
+    }
 
-		Move();
+    private void OnCellChange(Vector3Int position)
+    {
+        Debug.Log("OnCellChange");
+        gridPosition = position;
+		cellCenter = maze.grid.GetCellCenterWorld(gridPosition);
 
-		if (IsInCenter ()) {
-			DecideDirection ();
-		}
+        cellUp = GetNextCell(Vector3Int.up);
+        cellDown = GetNextCell(Vector3Int.down);
+        cellLeft = GetNextCell(Vector3Int.left);
+        cellRight = GetNextCell(Vector3Int.right);
 
-//		Debug.Log ("Ghost Position: " + gridPosition);
-	}
+        canMoveUp = maze.CanMove(cellUp);
+        canMoveDown = maze.CanMove(cellDown);
+        canMoveLeft = maze.CanMove(cellLeft);
+        canMoveRight = maze.CanMove(cellRight);
 
-	private void Move()
-	{
-		transform.position = Vector2.MoveTowards(transform.position, moveTo, speed * Time.deltaTime); 
+        direction = DecideDirection();
+        Vector3Int nextCell = GetNextCell(direction);
 
-//		Vector2 movement = direction * speed * Time.deltaTime;
-//		transform.Translate(movement);
-	}
+        if (maze.CanMove(nextCell))
+            moveTo = maze.grid.GetCellCenterWorld(nextCell);
+    }
 
-	private bool IsCorner()
-	{
-		int cellCount = GetAvailableCellCount();
+    private Vector3Int GetNextCell(Vector3Int direction)
+    {
+        return gridPosition + direction;
+    }
 
-		return cellCount >= 3;
-	}
+    private Vector3Int DecideDirection()
+    {
+        Vector3Int result = Vector3Int.zero;
 
-	private bool IsInCenter()
-	{
-		return transform.position == maze.grid.GetCellCenterWorld (gridPosition);
-	}
+        int availableCells = 0;
+        if (canMoveUp) availableCells++;
+        if (canMoveDown) availableCells++;
+        if (canMoveLeft) availableCells++;
+        if (canMoveRight) availableCells++;
 
-	private int GetAvailableCellCount()
-	{
-		int availableCells = 0;
+        if (availableCells == 2)
+        {
+            if ((canMoveUp && canMoveDown) || (canMoveLeft && canMoveRight))
+            {
+                // Caminho reto
+                result = direction;
+            }
+            else
+            {
+                // Curva (vai para próxima direção disponível, menos para tras)
+                Vector3Int backDirection = new Vector3Int(-direction.x, -direction.y, 0);
+                if (canMoveUp && Vector3Int.up != backDirection) result = Vector3Int.up;
+                else if (canMoveDown && Vector3Int.down != backDirection) result = Vector3Int.down;
+                else if (canMoveLeft && Vector3Int.left != backDirection) result = Vector3Int.left;
+                else if (canMoveRight && Vector3Int.right != backDirection) result = Vector3Int.right;
+            }
+        }
+        else if (availableCells > 2)
+        {
+            // Intersecção (3 ou 4 direções)
 
-		if (cellUp.canMove)
-			availableCells++;
+            // Ignora a direção contrária à atual (pra ele não voltar pelo caminho que estava vindo)
+            Vector3Int backDirection = new Vector3Int(-direction.x, -direction.y, 0);
+            // Decide a direção aleatoriamente
+            List<Vector3Int> directionList = new List<Vector3Int>();
+            if (canMoveUp && Vector3Int.up != backDirection) directionList.Add(Vector3Int.up);
+            if (canMoveDown && Vector3Int.down != backDirection) directionList.Add(Vector3Int.down);
+            if (canMoveLeft && Vector3Int.left != backDirection) directionList.Add(Vector3Int.left);
+            if (canMoveRight && Vector3Int.right != backDirection) directionList.Add(Vector3Int.right);
 
-		if (cellDown.canMove)
-			availableCells++;
+            result = directionList[Random.Range(0, directionList.Count)];
+        }
 
-		if (cellLeft.canMove)
-			availableCells++;
+		bool resultIsHorizontal = result.x != 0;
+		bool directionIsHorizontal = direction.x != 0;
+		if(resultIsHorizontal != directionIsHorizontal)
+			turning = true;
 
-		if (cellRight.canMove)
-			availableCells++;
+        return result;
+    }
 
-		return availableCells;
-	}
-
-	private MazeCell[] GetAvailableCells()
-	{
-		List<MazeCell> availableCells = new List<MazeCell>();
-
-		if (cellUp.canMove)
-			availableCells.Add (cellUp);
-
-		if (cellDown.canMove)
-			availableCells.Add (cellDown);
-
-		if (cellLeft.canMove)
-			availableCells.Add (cellLeft);
-
-		if (cellRight.canMove)
-			availableCells.Add (cellRight);
-
-		return availableCells.ToArray();
-	}
-
-	private void DecideDirection()
-	{
-		MazeCell[] availableCells = GetAvailableCells ();
-
-		if (IsCorner ())
+    private void Move()
+    {
+		if(turning)
 		{
-			Debug.Log ("Is Corner!");
-			direction = availableCells [Random.Range (0, availableCells.Length)].direction;
-		} 
-		else if(!nextCell.canMove) 
-		{
-			Debug.Log ("Is Not Corner!");
+			transform.position = Vector2.MoveTowards(transform.position, cellCenter, speed * Time.deltaTime);
 
-			foreach (MazeCell cell in availableCells) 
+			if(transform.position == cellCenter)
 			{
-				if (cell.canMove) {
-					direction = cell.direction;
-					return;
-				}
+				turning = false;
 			}
 		}
-	}
+		else
+		{
+        	transform.position = Vector2.MoveTowards(transform.position, moveTo, speed * Time.deltaTime);
+		}
+    }
 }
