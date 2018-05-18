@@ -2,15 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum GhostState { Chase, Scatter, Frightened }
+public enum GhostMovement { Waiting, Exiting, Moving, Dead }
+
 public class Ghost : MonoBehaviour
 {
     public float speed;
+    public int dotsToExit;
+    public Vector2 exitPosition;
+
     [HideInInspector] public Vector3Int gridPosition;
-	private Vector3 cellCenter;
+    private Vector3 cellCenter;
 
     private Vector3Int direction = Vector3Int.left;
     private Vector2 moveTo;
-	private bool turning;
+    private bool turning;
+    private int dotCount;
 
     private bool canMoveUp;
     private bool canMoveDown;
@@ -23,30 +30,47 @@ public class Ghost : MonoBehaviour
 
     private Maze maze;
 
+    public GhostState state;
+    public GhostMovement moveState;
+
     private void Start()
     {
         maze = Maze.Instance;
+        SetDotCount(0);
     }
 
     private void Update()
     {
-        Vector3Int pos = maze.grid.WorldToCell(transform.position);
-
-        if (pos != gridPosition)
+        switch (moveState)
         {
-            OnCellChange(pos);
+            case GhostMovement.Waiting:
+                // Animação para cima e para baixo:
+                break;
+            case GhostMovement.Exiting:
+                // Move para o centro da casa e depois para o labirinto
+                Exit();
+                break;
+            case GhostMovement.Moving:
+                // Move-se pelo labirinto
+                Vector3Int pos = maze.grid.WorldToCell(transform.position);
+                if (pos != gridPosition)
+                {
+                    OnCellChange(pos);
+                }
+
+                Move();
+                break;
+            case GhostMovement.Dead:
+                //Move de volta para a casa
+                break;
         }
-
-        Move();
-
-		
     }
 
     private void OnCellChange(Vector3Int position)
     {
         Debug.Log("OnCellChange");
         gridPosition = position;
-		cellCenter = maze.grid.GetCellCenterWorld(gridPosition);
+        cellCenter = maze.grid.GetCellCenterWorld(gridPosition);
 
         cellUp = GetNextCell(Vector3Int.up);
         cellDown = GetNextCell(Vector3Int.down);
@@ -113,28 +137,53 @@ public class Ghost : MonoBehaviour
             result = directionList[Random.Range(0, directionList.Count)];
         }
 
-		bool resultIsHorizontal = result.x != 0;
-		bool directionIsHorizontal = direction.x != 0;
-		if(resultIsHorizontal != directionIsHorizontal)
-			turning = true;
+        bool resultIsHorizontal = result.x != 0;
+        bool directionIsHorizontal = direction.x != 0;
+        if (resultIsHorizontal != directionIsHorizontal)
+            turning = true;
 
         return result;
     }
 
     private void Move()
     {
-		if(turning)
-		{
-			transform.position = Vector2.MoveTowards(transform.position, cellCenter, speed * Time.deltaTime);
+        if (turning)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, cellCenter, speed * Time.deltaTime);
 
-			if(transform.position == cellCenter)
-			{
-				turning = false;
-			}
-		}
-		else
-		{
-        	transform.position = Vector2.MoveTowards(transform.position, moveTo, speed * Time.deltaTime);
-		}
+            if (transform.position == cellCenter)
+            {
+                turning = false;
+            }
+        }
+        else
+        {
+            transform.position = Vector2.MoveTowards(transform.position, moveTo, speed * Time.deltaTime);
+        }
+    }
+
+    private void Exit()
+    {
+        if (transform.position.x != 0)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, new Vector2(0, transform.position.y), speed * Time.deltaTime);
+        }
+        else
+        {
+            transform.position = Vector2.MoveTowards(transform.position, exitPosition, speed * Time.deltaTime);
+
+            if ((Vector2)transform.position == exitPosition)
+            {
+                moveState = GhostMovement.Moving;
+            }
+        }
+    }
+
+    public void SetDotCount(int count)
+    {
+        dotCount = count;
+
+        if (dotCount >= dotsToExit)
+            moveState = GhostMovement.Exiting;
     }
 }

@@ -85,6 +85,16 @@ public class Maze : MonoBehaviour
                 // TODO Adicionar bonus da fase
                 AddBonus();
             }
+
+            // Contador para os fantasmas sairem
+            if(blinky.moveState == GhostMovement.Waiting)
+                blinky.SetDotCount(dotCount);
+            else if(pinky.moveState == GhostMovement.Waiting)
+                pinky.SetDotCount(dotCount);
+            else if(inky.moveState == GhostMovement.Waiting)
+                inky.SetDotCount(dotCount);
+            else if(clyde.moveState == GhostMovement.Waiting)
+                clyde.SetDotCount(dotCount);
         }
     }
     
