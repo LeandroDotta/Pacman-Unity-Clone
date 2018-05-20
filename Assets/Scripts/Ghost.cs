@@ -68,7 +68,6 @@ public class Ghost : MonoBehaviour
 
     private void OnCellChange(Vector3Int position)
     {
-        Debug.Log("OnCellChange");
         gridPosition = position;
         cellCenter = maze.grid.GetCellCenterWorld(gridPosition);
 
