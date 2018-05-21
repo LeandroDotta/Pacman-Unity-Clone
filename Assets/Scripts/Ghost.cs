@@ -11,9 +11,17 @@ public class Ghost : MonoBehaviour
     public int dotsToExit;
     public Vector2 exitPosition;
 
+    [Header("Waiting")]
+    public float waitingMoveDistance = 0.5f;
+    public Vector3Int waitingStartDirection = Vector3Int.up;
+    private Vector2 waitingUp;
+    private Vector2 waitingDown;
+
     [HideInInspector] public Vector3Int gridPosition;
     private Vector3 cellCenter;
 
+
+    private Vector2 origin;
     private Vector3Int direction = Vector3Int.left;
     private Vector2 moveTo;
     private bool turning;
@@ -36,7 +44,10 @@ public class Ghost : MonoBehaviour
     private void Start()
     {
         maze = Maze.Instance;
-        SetDotCount(0);
+
+        origin = transform.position;
+
+        SetMoveState(moveState);
     }
 
     private void Update()
@@ -45,6 +56,7 @@ public class Ghost : MonoBehaviour
         {
             case GhostMovement.Waiting:
                 // Animação para cima e para baixo:
+                WaitingMove();
                 break;
             case GhostMovement.Exiting:
                 // Move para o centro da casa e depois para o labirinto
@@ -174,8 +186,26 @@ public class Ghost : MonoBehaviour
 
             if ((Vector2)transform.position == exitPosition)
             {
-                moveState = GhostMovement.Moving;
+                SetMoveState(GhostMovement.Moving);
             }
+        }
+    }
+
+    private void WaitingMove()
+    {
+        if (direction == Vector3Int.up)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, waitingUp, speed * Time.deltaTime);
+
+            if((Vector2)transform.position == waitingUp)
+                direction = Vector3Int.down;
+        }
+        else if (direction == Vector3Int.down)
+        {
+            transform.position = Vector2.MoveTowards(transform.position, waitingDown, speed * Time.deltaTime);
+
+            if((Vector2)transform.position == waitingDown)
+                direction = Vector3Int.up;
         }
     }
 
@@ -184,6 +214,24 @@ public class Ghost : MonoBehaviour
         dotCount = count;
 
         if (dotCount >= dotsToExit)
-            moveState = GhostMovement.Exiting;
+            SetMoveState(GhostMovement.Exiting);
+    }
+
+    private void SetMoveState(GhostMovement state)
+    {
+        Debug.Log("SetMoveState");
+        moveState = state;
+
+        switch (moveState)
+        {
+            case GhostMovement.Waiting:
+                direction = waitingStartDirection;
+                waitingUp = new Vector2(origin.x, origin.y + waitingMoveDistance);
+                waitingDown = new Vector2(origin.x, origin.y - waitingMoveDistance);
+                break;
+            case GhostMovement.Moving:
+                direction = Vector3Int.left;
+                break;
+        }
     }
 }

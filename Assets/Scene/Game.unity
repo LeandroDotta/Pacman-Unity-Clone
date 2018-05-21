@@ -6043,6 +6043,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 143327776}
+  - component: {fileID: 143327775}
   - component: {fileID: 143327774}
   m_Layer: 0
   m_Name: Ghost_Inky
@@ -6065,9 +6066,29 @@ MonoBehaviour:
   speed: 5
   dotsToExit: 30
   exitPosition: {x: 0, y: 2.5}
+  waitingMoveDistance: 0.5
+  waitingStartDirection: {x: 0, y: 1, z: 0}
   gridPosition: {x: 0, y: 0, z: 0}
   state: 1
   moveState: 0
+--- !u!95 &143327775
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 143327773}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 635bce104a2bb9445b79a99ea125841c, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!4 &143327776
 Transform:
   m_ObjectHideFlags: 0
@@ -6112,6 +6133,8 @@ MonoBehaviour:
   speed: 5
   dotsToExit: 60
   exitPosition: {x: 0, y: 2.5}
+  waitingMoveDistance: 0.5
+  waitingStartDirection: {x: 0, y: 1, z: 0}
   gridPosition: {x: 0, y: 0, z: 0}
   state: 1
   moveState: 0
@@ -10310,6 +10333,8 @@ MonoBehaviour:
   speed: 5
   dotsToExit: 0
   exitPosition: {x: 0, y: 2.5}
+  waitingMoveDistance: 0.5
+  waitingStartDirection: {x: 0, y: 1, z: 0}
   gridPosition: {x: 0, y: 0, z: 0}
   state: 1
   moveState: 2
@@ -10424,9 +10449,11 @@ MonoBehaviour:
   speed: 5
   dotsToExit: 0
   exitPosition: {x: 0, y: 2.5}
+  waitingMoveDistance: 0.5
+  waitingStartDirection: {x: 0, y: 1, z: 0}
   gridPosition: {x: 0, y: 0, z: 0}
   state: 1
-  moveState: 0
+  moveState: 1
 --- !u!4 &2025091892
 Transform:
   m_ObjectHideFlags: 0
