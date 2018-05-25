@@ -6066,6 +6066,7 @@ MonoBehaviour:
   speed: 5
   dotsToExit: 30
   exitPosition: {x: 0, y: 2.5}
+  target: {x: 13, y: -19, z: 0}
   waitingMoveDistance: 0.5
   waitingStartDirection: {x: 0, y: 1, z: 0}
   gridPosition: {x: 0, y: 0, z: 0}
@@ -6161,6 +6162,7 @@ MonoBehaviour:
   speed: 5
   dotsToExit: 60
   exitPosition: {x: 0, y: 2.5}
+  target: {x: -14, y: -19, z: 0}
   waitingMoveDistance: 0.5
   waitingStartDirection: {x: 0, y: 1, z: 0}
   gridPosition: {x: 0, y: 0, z: 0}
@@ -10583,6 +10585,7 @@ MonoBehaviour:
   speed: 5
   dotsToExit: 0
   exitPosition: {x: 0, y: 2.5}
+  target: {x: 11, y: 16, z: 0}
   waitingMoveDistance: 0.5
   waitingStartDirection: {x: 0, y: 1, z: 0}
   gridPosition: {x: 0, y: 0, z: 0}
@@ -10699,6 +10702,7 @@ MonoBehaviour:
   speed: 5
   dotsToExit: 0
   exitPosition: {x: 0, y: 2.5}
+  target: {x: -12, y: 16, z: 0}
   waitingMoveDistance: 0.5
   waitingStartDirection: {x: 0, y: 1, z: 0}
   gridPosition: {x: 0, y: 0, z: 0}

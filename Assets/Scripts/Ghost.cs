@@ -10,6 +10,7 @@ public class Ghost : MonoBehaviour
     public float speed;
     public int dotsToExit;
     public Vector2 exitPosition;
+    public Vector3Int target;
 
     [Header("Waiting")]
     public float waitingMoveDistance = 0.5f;
@@ -38,6 +39,7 @@ public class Ghost : MonoBehaviour
 
     private Maze maze;
 
+    [Header("States")]
     public GhostState state;
     public GhostMovement moveState;
 
@@ -138,14 +140,57 @@ public class Ghost : MonoBehaviour
 
             // Ignora a direção contrária à atual (pra ele não voltar pelo caminho que estava vindo)
             Vector3Int backDirection = new Vector3Int(-direction.x, -direction.y, 0);
+            
             // Decide a direção aleatoriamente
             List<Vector3Int> directionList = new List<Vector3Int>();
-            if (canMoveUp && Vector3Int.up != backDirection) directionList.Add(Vector3Int.up);
-            if (canMoveDown && Vector3Int.down != backDirection) directionList.Add(Vector3Int.down);
-            if (canMoveLeft && Vector3Int.left != backDirection) directionList.Add(Vector3Int.left);
-            if (canMoveRight && Vector3Int.right != backDirection) directionList.Add(Vector3Int.right);
+            // if (canMoveUp && Vector3Int.up != backDirection) directionList.Add(Vector3Int.up);
+            // if (canMoveLeft && Vector3Int.left != backDirection) directionList.Add(Vector3Int.left);
+            // if (canMoveDown && Vector3Int.down != backDirection) directionList.Add(Vector3Int.down);
+            // if (canMoveRight && Vector3Int.right != backDirection) directionList.Add(Vector3Int.right);
 
-            result = directionList[Random.Range(0, directionList.Count)];
+            // result = directionList[Random.Range(0, directionList.Count)];
+
+            float shortest = 9999;
+            if (canMoveRight && Vector3Int.right != backDirection)
+            {
+                float distRight = Vector3Int.Distance(cellRight, target);
+
+                if(distRight <= shortest)
+                {
+                    shortest = distRight;
+                    result = Vector3Int.right;
+                }
+            }
+            if (canMoveDown && Vector3Int.down != backDirection)
+            {
+                float distDown = Vector3Int.Distance(cellDown, target);
+
+                if(distDown <= shortest)
+                {
+                    shortest = distDown;
+                    result = Vector3Int.down;
+                }
+            }
+            if (canMoveLeft && Vector3Int.left != backDirection)
+            {
+                float distLeft = Vector3Int.Distance(cellLeft, target);
+
+                if(distLeft <= shortest)
+                {
+                    shortest = distLeft;
+                    result = Vector3Int.left;
+                }
+            }
+            if (canMoveUp && Vector3Int.up != backDirection)
+            {
+                float distUp = Vector3Int.Distance(cellUp, target);
+
+                if(distUp <= shortest)
+                {
+                    shortest = distUp;
+                    result = Vector3Int.up;
+                }
+            }
         }
 
         bool resultIsHorizontal = result.x != 0;
