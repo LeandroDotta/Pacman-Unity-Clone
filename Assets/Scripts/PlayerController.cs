@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     private Vector2 direction = Vector2.left;
     private Vector2 inputDirection = Vector2.left;
 	private Vector3 startPosition;
-    private Vector3Int gridPosition;
+    [HideInInspector] public Vector3Int gridPosition;
 	private Animator anim;
 	private bool moving;
 

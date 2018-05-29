@@ -11,6 +11,9 @@ public class Maze : MonoBehaviour
     public Tilemap mazeTilemap;
     public Tilemap dotTilemap;
 
+    [Header("Player")]
+    public PlayerController player;
+
     [Header("Ghosts")]
     public Ghost blinky;
     public Ghost pinky;

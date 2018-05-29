@@ -6143,6 +6143,7 @@ MonoBehaviour:
   dotsToExit: 30
   exitPosition: {x: 0, y: 2.5}
   target: {x: 13, y: -19, z: 0}
+  blindSpot: {x: 13, y: -19, z: 0}
   waitingMoveDistance: 0.5
   waitingStartDirection: {x: 0, y: 1, z: 0}
   gridPosition: {x: 0, y: 0, z: 0}
@@ -6301,6 +6302,7 @@ MonoBehaviour:
   dotsToExit: 60
   exitPosition: {x: 0, y: 2.5}
   target: {x: -14, y: -19, z: 0}
+  blindSpot: {x: -14, y: -19, z: 0}
   waitingMoveDistance: 0.5
   waitingStartDirection: {x: 0, y: 1, z: 0}
   gridPosition: {x: 0, y: 0, z: 0}
@@ -10052,6 +10054,7 @@ MonoBehaviour:
   speed: 6
   sprite: {fileID: 87299739}
   maze: {fileID: 779573013}
+  gridPosition: {x: 0, y: 0, z: 0}
 --- !u!82 &576050542
 AudioSource:
   m_ObjectHideFlags: 0
@@ -10279,6 +10282,7 @@ MonoBehaviour:
   grid: {fileID: 779573011}
   mazeTilemap: {fileID: 42492991}
   dotTilemap: {fileID: 435329683}
+  player: {fileID: 576050541}
   blinky: {fileID: 1879719519}
   pinky: {fileID: 2025091890}
   inky: {fileID: 143327774}
@@ -10724,6 +10728,7 @@ MonoBehaviour:
   dotsToExit: 0
   exitPosition: {x: 0, y: 2.5}
   target: {x: 11, y: 16, z: 0}
+  blindSpot: {x: 11, y: 16, z: 0}
   waitingMoveDistance: 0.5
   waitingStartDirection: {x: 0, y: 1, z: 0}
   gridPosition: {x: 0, y: 0, z: 0}
@@ -10841,6 +10846,7 @@ MonoBehaviour:
   dotsToExit: 0
   exitPosition: {x: 0, y: 2.5}
   target: {x: -12, y: 16, z: 0}
+  blindSpot: {x: -12, y: 16, z: 0}
   waitingMoveDistance: 0.5
   waitingStartDirection: {x: 0, y: 1, z: 0}
   gridPosition: {x: 0, y: 0, z: 0}

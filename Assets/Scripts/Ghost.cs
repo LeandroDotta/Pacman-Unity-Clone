@@ -11,6 +11,7 @@ public class Ghost : MonoBehaviour
     public int dotsToExit;
     public Vector2 exitPosition;
     public Vector3Int target;
+    public Vector3Int blindSpot;
 
     [Header("Waiting")]
     public float waitingMoveDistance = 0.5f;
@@ -19,11 +20,13 @@ public class Ghost : MonoBehaviour
     private Vector2 waitingDown;
 
     [HideInInspector] public Vector3Int gridPosition;
+
     private Vector3 cellCenter;
 
 
     private Vector2 origin;
     private Vector3Int direction = Vector3Int.left;
+    private Vector3Int backDirection;
     private Vector2 moveTo;
     private bool turning;
     private int dotCount;
@@ -78,6 +81,9 @@ public class Ghost : MonoBehaviour
                 //Move de volta para a casa
                 break;
         }
+
+        // if(Input.GetKeyDown(KeyCode.Space))
+        //     Invert();
     }
 
     private void OnCellChange(Vector3Int position)
@@ -95,7 +101,11 @@ public class Ghost : MonoBehaviour
         canMoveLeft = maze.CanMove(cellLeft);
         canMoveRight = maze.CanMove(cellRight);
 
+        DecideTarget();
+
+        backDirection = new Vector3Int(-direction.x, -direction.y, 0);
         direction = DecideDirection();
+        
         Vector3Int nextCell = GetNextCell(direction);
 
         if (maze.CanMove(nextCell))
@@ -105,6 +115,19 @@ public class Ghost : MonoBehaviour
     private Vector3Int GetNextCell(Vector3Int direction)
     {
         return gridPosition + direction;
+    }
+
+    private void DecideTarget()
+    {
+        switch(state)
+        {
+            case GhostState.Scatter:
+                target = blindSpot;
+                break;
+            case GhostState.Chase:
+                target = Maze.Instance.player.gridPosition;
+                break;       
+        }
     }
 
     private Vector3Int DecideDirection()
@@ -127,7 +150,6 @@ public class Ghost : MonoBehaviour
             else
             {
                 // Curva (vai para próxima direção disponível, menos para tras)
-                Vector3Int backDirection = new Vector3Int(-direction.x, -direction.y, 0);
                 if (canMoveUp && Vector3Int.up != backDirection) result = Vector3Int.up;
                 else if (canMoveDown && Vector3Int.down != backDirection) result = Vector3Int.down;
                 else if (canMoveLeft && Vector3Int.left != backDirection) result = Vector3Int.left;
@@ -138,18 +160,7 @@ public class Ghost : MonoBehaviour
         {
             // Intersecção (3 ou 4 direções)
 
-            // Ignora a direção contrária à atual (pra ele não voltar pelo caminho que estava vindo)
-            Vector3Int backDirection = new Vector3Int(-direction.x, -direction.y, 0);
-            
-            // Decide a direção aleatoriamente
-            List<Vector3Int> directionList = new List<Vector3Int>();
-            // if (canMoveUp && Vector3Int.up != backDirection) directionList.Add(Vector3Int.up);
-            // if (canMoveLeft && Vector3Int.left != backDirection) directionList.Add(Vector3Int.left);
-            // if (canMoveDown && Vector3Int.down != backDirection) directionList.Add(Vector3Int.down);
-            // if (canMoveRight && Vector3Int.right != backDirection) directionList.Add(Vector3Int.right);
-
-            // result = directionList[Random.Range(0, directionList.Count)];
-
+            // Decide o caminho mais curto
             float shortest = 9999;
             if (canMoveRight && Vector3Int.right != backDirection)
             {
@@ -277,5 +288,22 @@ public class Ghost : MonoBehaviour
                 direction = Vector3Int.left;
                 break;
         }
+    }
+
+    // private void Invert()
+    // {
+    //     // Verifica se o fantasma está realizando uma curva
+    //     bool dirHorizontal = IsHorizontal(direction);
+    //     bool backDirHorizontal = IsHorizontal(backDirection);
+
+    //     // Atribui o valor de turning para que ele vá ao centro da celula antes de voltar ao realizar uma curva
+    //     turning = dirHorizontal != backDirHorizontal;
+
+    //     direction = backDirection;
+    // }
+
+    private bool IsHorizontal(Vector3Int dir)
+    {
+        return dir.x != 0;
     }
 }
