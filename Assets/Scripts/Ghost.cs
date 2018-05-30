@@ -269,6 +269,16 @@ public class Ghost : MonoBehaviour
             SetMoveState(GhostMovement.Exiting);
     }
 
+    public void SetState(GhostState newState)
+    {
+        if(state != newState && state != GhostState.Frightened)
+        {
+            Invert();
+        }
+
+        state = newState;
+    }
+
     private void SetMoveState(GhostMovement state)
     {
         Debug.Log("SetMoveState");

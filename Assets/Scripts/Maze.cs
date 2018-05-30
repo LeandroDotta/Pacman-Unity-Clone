@@ -20,6 +20,14 @@ public class Maze : MonoBehaviour
     public Ghost inky;
     public Ghost clyde;
 
+    public float chaseTime;
+    public float scatterTime;
+    public float frightenedTime;
+    
+    private float ghostStateTimer;
+    private GhostState currentGhostState;
+
+
     [Header("Bonus Config")]
     public int dotsForFirstBonus;
     public int dotsForSecondBonus;
@@ -48,7 +56,38 @@ public class Maze : MonoBehaviour
 
         totalDots = GetTileCount(ref dotTilemap);
 
-        Debug.Log("Dot Total: " + totalDots);
+        currentGhostState = GhostState.Scatter;
+    }
+
+    private void Update() 
+    {
+        ghostStateTimer += Time.deltaTime;
+
+        if(currentGhostState == GhostState.Chase && ghostStateTimer >= chaseTime)
+        {
+            currentGhostState = GhostState.Scatter;
+            blinky.SetState(GhostState.Scatter);
+            pinky.SetState(GhostState.Scatter);
+            inky.SetState(GhostState.Scatter);
+            clyde.SetState(GhostState.Scatter);
+
+            ghostStateTimer = 0;
+
+            Debug.Log("Ghost State: Scatter");
+        }
+
+        if(currentGhostState == GhostState.Scatter && ghostStateTimer >= scatterTime)
+        {
+            currentGhostState = GhostState.Chase;
+            blinky.SetState(GhostState.Chase);
+            pinky.SetState(GhostState.Chase);
+            inky.SetState(GhostState.Chase);
+            clyde.SetState(GhostState.Chase);
+
+            ghostStateTimer = 0;
+
+            Debug.Log("Ghost State: Chase");
+        }
     }
 
     public bool CanMove(Vector3Int cell)

@@ -10287,6 +10287,9 @@ MonoBehaviour:
   pinky: {fileID: 2025091890}
   inky: {fileID: 143327774}
   clyde: {fileID: 372889437}
+  chaseTime: 10
+  scatterTime: 4
+  frightenedTime: 5
   dotsForFirstBonus: 70
   dotsForSecondBonus: 170
   bonusPosition: {x: -0, y: -3.5}
