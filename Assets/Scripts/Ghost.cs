@@ -81,9 +81,6 @@ public class Ghost : MonoBehaviour
                 //Move de volta para a casa
                 break;
         }
-
-        // if(Input.GetKeyDown(KeyCode.Space))
-        //     Invert();
     }
 
     private void OnCellChange(Vector3Int position)
@@ -290,17 +287,14 @@ public class Ghost : MonoBehaviour
         }
     }
 
-    // private void Invert()
-    // {
-    //     // Verifica se o fantasma está realizando uma curva
-    //     bool dirHorizontal = IsHorizontal(direction);
-    //     bool backDirHorizontal = IsHorizontal(backDirection);
+    private void Invert()
+    {
+        Vector3Int tempDir = direction;
+        direction = backDirection;
+        backDirection = direction;
 
-    //     // Atribui o valor de turning para que ele vá ao centro da celula antes de voltar ao realizar uma curva
-    //     turning = dirHorizontal != backDirHorizontal;
-
-    //     direction = backDirection;
-    // }
+        OnCellChange(gridPosition);
+    }
 
     private bool IsHorizontal(Vector3Int dir)
     {
